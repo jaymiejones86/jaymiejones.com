@@ -1,4 +1,9 @@
+# Ignore Standard Files
 CHANGELOG.md
 CONTRIBUTING.md
 LICENSE.txt
 .DS_Store
+
+# Ignore Databases
+content/data/ghost-dev.db
+content/data/ghost.db
