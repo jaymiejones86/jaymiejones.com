@@ -44,7 +44,17 @@ config = {
     // Configure your URL and mail settings here
     production: {
         url: 'http://jaymiejones.com',
-        mail: {},
+        mail: {
+          transport: 'SMTP',
+            host: 'smtp.mailgun.org',
+              options: {
+                service: 'Mailgun',
+                  auth: {
+                  user: process.env.JJ_MAILGUN_USER,
+                  pass: process.env.JJ_MAILGUN_PASS
+             }
+           }
+        },
         database: {
             client: 'mysql',
             connection: {
