@@ -46,9 +46,13 @@ config = {
         url: 'http://jaymiejones.com',
         mail: {},
         database: {
-            client: 'sqlite3',
+            client: 'mysql',
             connection: {
-                filename: path.join(__dirname, '/content/data/ghost.db')
+              host: 'localhost',
+              user: process.env.JJ_GHOST_USER,
+              password: process.env.JJ_GHOST_PASS,
+              database: process.env.JJ_GHOST_DB,
+              charset: 'utf8'
             },
             debug: false
         },
