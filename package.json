@@ -31,7 +31,8 @@
         "validator": "1.4.0",
         "rss": "0.2.0",
         "nodemailer": "~0.5.2",
-        "mysql": "~2.0.0-alpha9"
+        "mysql": "~2.0.0-alpha9",
+        "forever": "0.10.8"
     },
     "devDependencies": {
         "grunt": "~0.4.1",
