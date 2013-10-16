@@ -7,3 +7,4 @@ LICENSE.txt
 # Ignore Databases
 content/data/ghost-dev.db
 content/data/ghost.db
+content/images
