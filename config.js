@@ -43,7 +43,7 @@ config = {
     // When running Ghost in the wild, use the production environment
     // Configure your URL and mail settings here
     production: {
-        url: 'http://jaymiejones.com',
+        url: 'http://pixelstack.com',
         mail: {
           transport: 'SMTP',
             host: 'smtp.mailgun.org',
