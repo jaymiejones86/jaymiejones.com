@@ -202,6 +202,9 @@
             if (self.className.indexOf('notification-persistent') !== -1) {
                 $.ajax({
                     type: "DELETE",
+                    headers: {
+                        'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                    },
                     url: '/api/v0.1/notifications/' + $(self).find('.close').data('id')
                 }).done(function (result) {
                     bbSelf.$el.slideUp(250, function () {
@@ -231,6 +234,9 @@
                 bbSelf = this;
             $.ajax({
                 type: "DELETE",
+                headers: {
+                    'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                },
                 url: '/api/v0.1/notifications/' + $(self).data('id')
             }).done(function (result) {
                 var height = bbSelf.$('.js-notification').outerHeight(true),
@@ -419,7 +425,7 @@
 
         showNext: function () {
             if (this.isLoading) { return; }
-            var id = this.collection.at(0).id;
+            var id = this.collection.at(0) ? this.collection.at(0).id : false;
             if (id) {
                 Backbone.trigger('blog:activeItem', id);
             }
@@ -461,6 +467,8 @@
             this.isLoading = true;
 
             this.collection.fetch({
+                update: true,
+                remove: false,
                 data: {
                     status: 'all',
                     page: (self.collection.currentPage + 1),
@@ -1187,6 +1195,8 @@
             this.$('#entry-title').val(this.model.get('title')).focus();
             this.$('#entry-markdown').text(this.model.get('markdown'));
 
+            this.listenTo(this.model, 'change:title', this.renderTitle);
+
             this.initMarkdown();
             this.renderPreview();
 
@@ -1267,6 +1277,10 @@
             }
         },
 
+        renderTitle: function () {
+            this.$('#entry-title').val(this.model.get('title'));
+        },
+
         // This is a hack to remove iOS6 white space on orientation change bug
         // See: http://cl.ly/RGx9
         orientationChange: function () {
@@ -1338,10 +1352,9 @@
         initUploads: function () {
             this.$('.js-drop-zone').upload({editor: true});
             this.$('.js-drop-zone').on('uploadstart', $.proxy(this.disableEditor, this));
-            this.$('.js-drop-zone').on('uploadstart', this.uploadMgr.handleDownloadStart);
             this.$('.js-drop-zone').on('uploadfailure', $.proxy(this.enableEditor, this));
             this.$('.js-drop-zone').on('uploadsuccess', $.proxy(this.enableEditor, this));
-            this.$('.js-drop-zone').on('uploadsuccess', this.uploadMgr.handleDownloadSuccess);
+            this.$('.js-drop-zone').on('uploadsuccess', this.uploadMgr.handleUpload);
         },
 
         enableEditor: function () {
@@ -1506,7 +1519,7 @@
             // TODO: hasMarker but no image?
         }
 
-        function handleDownloadStart(e) {
+        function handleUpload(e, result_src) {
             /*jslint regexp: true, bitwise: true */
             var line = findLine($(e.currentTarget).attr('id')),
                 lineNumber = editor.getLineNumber(line),
@@ -1531,9 +1544,6 @@
                     );
                 }
             }
-        }
-
-        function handleDownloadSuccess(e, result_src) {
             editor.replaceSelection(result_src);
         }
 
@@ -1550,8 +1560,7 @@
         // Public API
         _.extend(this, {
             getEditorValue: getEditorValue,
-            handleDownloadStart: handleDownloadStart,
-            handleDownloadSuccess: handleDownloadSuccess
+            handleUpload: handleUpload
         });
 
         // initialise
@@ -1604,6 +1613,9 @@
                 $.ajax({
                     url: '/ghost/signin/',
                     type: 'POST',
+                    headers: {
+                        'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                    },
                     data: {
                         email: email,
                         password: password,
@@ -1658,6 +1670,9 @@
                 $.ajax({
                     url: '/ghost/signup/',
                     type: 'POST',
+                    headers: {
+                        'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                    },
                     data: {
                         name: name,
                         email: email,
@@ -1707,6 +1722,9 @@
                 $.ajax({
                     url: '/ghost/forgotten/',
                     type: 'POST',
+                    headers: {
+                        'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                    },
                     data: {
                         email: email
                     },
@@ -1942,7 +1960,7 @@
 
             this.addSubview(this.sidebar);
 
-            this.listenTo(Ghost.router, "route:settings", this.changePane);
+            this.listenTo(Ghost.router, 'route:settings', this.changePane);
         },
 
         changePane: function (pane) {
@@ -2079,7 +2097,8 @@
         },
 
         saveSettings: function () {
-            var title = this.$('#blog-title').val(),
+            var self = this,
+                title = this.$('#blog-title').val(),
                 description = this.$('#blog-description').val(),
                 email = this.$('#email-address').val(),
                 postsPerPage = this.$('#postsPerPage').val();
@@ -2110,7 +2129,7 @@
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
-                });
+                }).then(function () { self.render(); });
             }
         },
         showLogo: function (e) {
@@ -2127,8 +2146,8 @@
             var self = this, upload = new Ghost.Models.uploadModal({'key': key, 'src': src, 'accept': {
                 func: function () { // The function called on acceptance
                     var data = {};
-                    if (this.$('#uploadurl').val()) {
-                        data[key] = this.$('#uploadurl').val();
+                    if (this.$('.js-upload-url').val()) {
+                        data[key] = this.$('.js-upload-url').val();
                     } else {
                         data[key] = this.$('.js-upload-target').attr('src');
                     }
@@ -2136,8 +2155,10 @@
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
+
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -2184,16 +2205,17 @@
             var self = this, upload = new Ghost.Models.uploadModal({'key': key, 'src': src, 'accept': {
                 func: function () { // The function called on acceptance
                     var data = {};
-                    if (this.$('#uploadurl').val()) {
-                        data[key] = this.$('#uploadurl').val();
+                    if (this.$('.js-upload-url').val()) {
+                        data[key] = this.$('.js-upload-url').val();
                     } else {
                         data[key] = this.$('.js-upload-target').attr('src');
                     }
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -2207,7 +2229,8 @@
 
 
         saveUser: function () {
-            var userName = this.$('#user-name').val(),
+            var self = this,
+                userName = this.$('#user-name').val(),
                 userEmail = this.$('#user-email').val(),
                 userLocation = this.$('#user-location').val(),
                 userWebsite = this.$('#user-website').val(),
@@ -2246,6 +2269,8 @@
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
+                }).then(function () {
+                    self.render();
                 });
             }
         },
@@ -2268,6 +2293,9 @@
                 $.ajax({
                     url: '/ghost/changepw/',
                     type: 'POST',
+                    headers: {
+                        'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                    },
                     data: {
                         password: oldPassword,
                         newpassword: newPassword,
@@ -2289,6 +2317,8 @@
                             status: 'passive'
                         });
                     }
+                }).then(function () {
+                    self.render();
                 });
             }
         },

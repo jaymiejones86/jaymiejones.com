@@ -18,7 +18,7 @@
 
             this.addSubview(this.sidebar);
 
-            this.listenTo(Ghost.router, "route:settings", this.changePane);
+            this.listenTo(Ghost.router, 'route:settings', this.changePane);
         },
 
         changePane: function (pane) {
@@ -155,7 +155,8 @@
         },
 
         saveSettings: function () {
-            var title = this.$('#blog-title').val(),
+            var self = this,
+                title = this.$('#blog-title').val(),
                 description = this.$('#blog-description').val(),
                 email = this.$('#email-address').val(),
                 postsPerPage = this.$('#postsPerPage').val();
@@ -186,7 +187,7 @@
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
-                });
+                }).then(function () { self.render(); });
             }
         },
         showLogo: function (e) {
@@ -203,8 +204,8 @@
             var self = this, upload = new Ghost.Models.uploadModal({'key': key, 'src': src, 'accept': {
                 func: function () { // The function called on acceptance
                     var data = {};
-                    if (this.$('#uploadurl').val()) {
-                        data[key] = this.$('#uploadurl').val();
+                    if (this.$('.js-upload-url').val()) {
+                        data[key] = this.$('.js-upload-url').val();
                     } else {
                         data[key] = this.$('.js-upload-target').attr('src');
                     }
@@ -212,8 +213,10 @@
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
+
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -260,16 +263,17 @@
             var self = this, upload = new Ghost.Models.uploadModal({'key': key, 'src': src, 'accept': {
                 func: function () { // The function called on acceptance
                     var data = {};
-                    if (this.$('#uploadurl').val()) {
-                        data[key] = this.$('#uploadurl').val();
+                    if (this.$('.js-upload-url').val()) {
+                        data[key] = this.$('.js-upload-url').val();
                     } else {
                         data[key] = this.$('.js-upload-target').attr('src');
                     }
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -283,7 +287,8 @@
 
 
         saveUser: function () {
-            var userName = this.$('#user-name').val(),
+            var self = this,
+                userName = this.$('#user-name').val(),
                 userEmail = this.$('#user-email').val(),
                 userLocation = this.$('#user-location').val(),
                 userWebsite = this.$('#user-website').val(),
@@ -322,6 +327,8 @@
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
+                }).then(function () {
+                    self.render();
                 });
             }
         },
@@ -344,6 +351,9 @@
                 $.ajax({
                     url: '/ghost/changepw/',
                     type: 'POST',
+                    headers: {
+                        'X-CSRF-Token': $("meta[name='csrf-param']").attr('content')
+                    },
                     data: {
                         password: oldPassword,
                         newpassword: newPassword,
@@ -365,6 +375,8 @@
                             status: 'passive'
                         });
                     }
+                }).then(function () {
+                    self.render();
                 });
             }
         },

@@ -937,7 +937,8 @@ nav li {
     speak: none;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
-    content: "\e000"; }
+    content: "\e000";
+    line-height: 0; }
   .ghost-logo:hover {
     text-decoration: none; }
   .ghost-logo:hover {
@@ -1673,20 +1674,6 @@ nav li {
   background: rgba(0, 0, 0, 0.4);
   z-index: 1030; }
 
-body.blur > *:not(#modal-container) {
-  -webkit-transition: all 0.15s linear 0s;
-  -moz-transition: all 0.15s linear 0s;
-  transition: all 0.15s linear 0s;
-  -webkit-filter: blur(2px);
-  -moz-filter: blur(2px);
-  -ms-filter: blur(2px);
-  -o-filter: blur(2px);
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
-  transform: translateZ(0); }
-
 .modal-info, .modal-action, .modal {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1710,20 +1697,24 @@ body.blur > *:not(#modal-container) {
     .modal-info, .modal-action, .modal {
       width: 100%;
       margin-left: 0; } }
+  .modal-info .image-uploader, .modal-action .image-uploader,
+  .modal-info .pre-image-uploader,
+  .modal-action .pre-image-uploader, .modal .image-uploader,
+  .modal .pre-image-uploader {
+    margin: 0; }
 
 .modal-action {
   padding: 60px 0 30px; }
   @media (max-width: 800px), (max-width: 800px) {
     .modal-action {
       padding: 30px 0; } }
-  .modal-action .modal-footer {
-    margin-top: 20px; }
 
 .modal-content {
   -webkit-box-sizing: padding-box;
   -moz-box-sizing: padding-box;
   box-sizing: padding-box;
   position: relative;
+  padding: 20px;
   background-clip: padding-box;
   background-color: #FFFFFF;
   border-radius: 2px;
@@ -1774,12 +1765,10 @@ body.blur > *:not(#modal-container) {
 .modal-body {
   position: relative;
   min-height: 100px;
-  padding: 0 20px;
   overflow-y: auto; }
 
 .modal-footer {
-  padding: 20px;
-  padding-top: 0; }
+  margin-top: 20px; }
 
 .modal-style-wide {
   width: 550px; }
@@ -1895,6 +1884,9 @@ main {
     text-decoration: none; }
     .image-uploader a:hover {
       color: #242628; }
+  .image-uploader .description {
+    margin-top: 10px;
+    margin-bottom: -40px; }
   .image-uploader .centre {
     position: relative;
     top: 50px;
@@ -1970,12 +1962,11 @@ main {
       text-decoration: none; }
   .image-uploader .image-cancel {
     position: absolute;
+    color: white;
+    text-shadow: rgba(0, 0, 0, 0.3) 0 0 3px;
     top: 10px;
     right: 10px;
-    padding: 8px;
-    color: #aaa9a2;
-    text-decoration: none;
-    line-height: 0; }
+    text-decoration: none; }
     .image-uploader .image-cancel:before {
       font-family: "Icons";
       font-weight: normal;
@@ -1986,11 +1977,12 @@ main {
       line-height: 1;
       -webkit-font-smoothing: antialiased;
       content: "\e034";
-      font-size: 14px; }
+      font-size: 16px; }
     .image-uploader .image-cancel:hover {
       text-decoration: none; }
     .image-uploader .image-cancel:hover {
-      cursor: pointer; }
+      cursor: pointer;
+      color: white; }
   .image-uploader input.main {
     position: absolute;
     right: 0;
@@ -2057,10 +2049,6 @@ main {
     background: #5ba4e5; }
     .image-uploader .bar.fail {
       background: #e25440; }
-
-.image-uploader-url .description {
-  margin-top: 10px;
-  margin-bottom: -40px; }
 
 .pre-image-uploader {
   -webkit-box-sizing: border-box;
@@ -4803,8 +4791,8 @@ body.zen {
     z-index: 2; }
     .settings .user-image .img {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 110px;
+      height: 110px;
       background-image: url(/shared/img/user-image.png);
       background-size: cover;
       background-position: center center; }
@@ -4812,14 +4800,17 @@ body.zen {
       opacity: 1; }
   .settings .edit-user-image {
     position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
     border-radius: 100%;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     color: #fff;
+    line-height: 105px;
+    text-transform: uppercase;
+    text-decoration: none;
     -webkit-transition: opacity 0.3s ease;
     -moz-transition: opacity 0.3s ease;
     transition: opacity 0.3s ease; }

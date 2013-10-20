@@ -78,6 +78,7 @@ adminControllers = {
             tmp_path = req.files.uploadimage.path,
             dir = path.join('content/images', year, month),
             ext = path.extname(req.files.uploadimage.name).toLowerCase(),
+            type = req.files.uploadimage.type,
             basename = path.basename(req.files.uploadimage.name, ext).replace(/[\W]/gi, '_');
 
         function renameFile(target_path) {
@@ -105,13 +106,14 @@ adminControllers = {
             });
         }
 
-        // TODO: is it better to use file type eg. image/png?
-        if (ext === '.jpg' || ext === '.jpeg'  || ext === '.png' || ext === '.gif') {
+        //limit uploads to type && extension
+        if ((type === 'image/jpeg' || type === 'image/png' || type === 'image/gif')
+                && (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.gif')) {
             getUniqueFileName(dir, basename, ext, null, function (filename) {
                 renameFile(filename);
             });
         } else {
-            res.send(404, "Invalid filetype");
+            res.send(403, 'Invalid file type');
         }
     },
     'login': function (req, res) {
@@ -143,7 +145,6 @@ adminControllers = {
         } else {
             res.json(401, {error: 'Slow down, there are way too many login attempts!'});
         }
-
     },
     changepw: function (req, res) {
         api.users.changePassword({
@@ -228,7 +229,7 @@ adminControllers = {
         }).otherwise(errors.logAndThrowError);
     },
     'logout': function (req, res) {
-        delete req.session.user;
+        req.session = null;
         var notification = {
             type: 'success',
             message: 'You were successfully signed out',
@@ -368,40 +369,15 @@ adminControllers = {
                     };
 
                     return api.notifications.add(notification).then(function () {
-                        delete req.session.user;
+                        req.session = null;
+                        res.set({
+                            "X-Cache-Invalidate": "/*"
+                        });
                         res.redirect('/ghost/signin/');
                     });
 
                 }, function importFailure(error) {
                     // Notify of an error if it occurs
-                    var notification = {
-                        type: 'error',
-                        message: error.message || error,
-                        status: 'persistent',
-                        id: 'per-' + (ghost.notifications.length + 1)
-                    };
-
-                    return api.notifications.add(notification).then(function () {
-                        res.redirect('/ghost/debug/');
-                    });
-                });
-        },
-        'reset': function (req, res) {
-            // Grab the current version so we can get the migration
-            dataProvider.reset()
-                .then(function resetSuccess() {
-                    var notification = {
-                        type: 'success',
-                        message: "Database reset. Create a new user",
-                        status: 'persistent',
-                        id: 'per-' + (ghost.notifications.length + 1)
-                    };
-
-                    return api.notifications.add(notification).then(function () {
-                        delete req.session.user;
-                        res.redirect('/ghost/signup/');
-                    });
-                }, function resetFailure(error) {
                     var notification = {
                         type: 'error',
                         message: error.message || error,
