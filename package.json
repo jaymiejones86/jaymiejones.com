@@ -31,7 +31,7 @@
     },
     "engineStrict": true,
     "dependencies": {
-        "bcryptjs": "0.7.10",
+        "bcryptjs": "2.4.3",
         "body-parser": "1.6.3",
         "bookshelf": "0.7.6",
         "busboy": "0.2.3",
