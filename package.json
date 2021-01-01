@@ -46,7 +46,7 @@
         "express-session": "1.0.4",
         "fs-extra": "0.8.1",
         "html-to-text": "^0.1.0",
-        "knex": "0.6.21",
+        "knex": "0.21.15",
         "lodash": "2.4.1",
         "moment": "2.4.0",
         "morgan": "1.0.0",
