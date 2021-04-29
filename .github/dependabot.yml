@@ -1,0 +1,23 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "17:00"
+    timezone: Australia/Sydney
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: knex
+    versions:
+    - 0.21.15
+    - 0.21.17
+  - dependency-name: supertest
+    versions:
+    - 6.0.1
+  - dependency-name: lodash
+    versions:
+    - 4.17.20
+  - dependency-name: bower
+    versions:
+    - 1.8.8
