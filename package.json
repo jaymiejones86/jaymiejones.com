@@ -58,7 +58,7 @@
         "passport-http-bearer": "1.0.1",
         "passport-oauth2-client-password": "0.1.1",
         "rss": "0.2.1",
-        "semver": "2.2.1",
+        "semver": "7.3.5",
         "showdown": "https://github.com/ErisDS/showdown/archive/v0.3.2-ghost.tar.gz",
         "static-favicon": "1.0.2",
         "unidecode": "0.1.3",
